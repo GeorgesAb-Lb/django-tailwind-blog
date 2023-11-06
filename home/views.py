@@ -5,8 +5,10 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.core.mail import send_mail
 from django.db.models import Q
+from .models import Contact
 import random
 import re
+from django.template import RequestContext
 
 # Create your views here.
 def index (request):
@@ -23,42 +25,33 @@ def thanks(request):
 
 def contact (request):
     if request.method == 'POST':
+        contact=Contact()
         name = request.POST.get('name')
         email = request.POST.get('email')
         phone = request.POST.get('phone')
         message = request.POST.get('message')
-        invalid_imput = ['', ' ']
-        if name in invalid_imput or email in invalid_imput or phone in invalid_imput or message in invalid_imput:
-            messages.error(request, 'One or more fields are empty!')
+        if len(message) != 0 and len(name) != 0 and len(email) != 0 and len(phone) != 0:
+            contact.name=name
+            contact.email=email
+            contact.phone=phone
+            contact.message=message
+            contact.save()
+            alert = True
+            return render(request, 'contact.html', {
+                'alert':alert
+            })
         else:
-            email_pattern = re.compile(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
-            phone_pattern = re.compile(r'^[0-9]{10}$')
-
-            if email_pattern.match(email) and phone_pattern.match(phone):
-                form_data = {
-                'name':name,
-                'email':email,
-                'phone':phone,
-                'message':message,
-                }
-                message = '''
-                From:\n\t\t{}\n
-                Message:\n\t\t{}\n
-                Email:\n\t\t{}\n
-                Phone:\n\t\t{}\n
-                '''.format(form_data['name'], form_data['message'], form_data['email'],form_data['phone'])
-                send_mail('You got a mail!', message, '', ['dev.ash.py@gmail.com'])
-                messages.success(request, 'Your message was sent.')
-                # return HttpResponseRedirect('/thanks')
-            else:
-                messages.error(request, 'Email or Phone is Invalid!')
-    return render(request, 'contact.html', {})
+            wrong = True
+            return render(request, 'contact.html', {
+                'wrong':wrong
+            })
+    return render(request, "contact.html")
 
 def projects (request):
     return render(request, 'projects.html')
 
 def blog(request):
-    blogs = Blog.objects.all().order_by('-time')
+    blogs = Blog.objects.all().order_by('time')
     paginator = Paginator(blogs, 3)
     page = request.GET.get('page')
     blogs = paginator.get_page(page)
@@ -81,6 +74,7 @@ def categories(request):
 
 def search(request):
     query = request.GET.get('q')
+
     query_list = query.split()
     results = Blog.objects.none()
     for word in query_list:
@@ -94,6 +88,11 @@ def search(request):
         message = ""
     return render(request, 'search.html', {'results': results, 'query': query, 'message': message})
 
+
+def privacy(request):
+    return render(request, 'privacy.html')
+def disclaimer(request):
+    return render(request, "disclaimer.html")
 
 def blogpost (request, slug):
     try:

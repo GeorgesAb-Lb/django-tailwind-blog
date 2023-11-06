@@ -15,6 +15,13 @@
         {% endfor %}
     </div>
     {% endif %}
+    {% if alert %}
+        <h1 style="text-align:center; border-radius: 20px;border:50px; color:limegreen; background: rgba(0,0,0,0.25)">Thank You For Contacting Us</h1>
+    {% endif %}
+    {% if wrong %}
+    <h1 style="text-align:center; border-radius: 20px;border:50px; color:red; background: rgba(0,0,0,0.25)">Sorry Something Went Wrong!</h1>
+    {% endif %}
+
 
     <form class='flex-col p-5' action="/contact" name="contactForm" method="POST" onsubmit="return validateForm()">
         {% csrf_token %}
@@ -28,7 +35,7 @@
         </div>
         <div class='phone'>
             <label for="phone">Phone</label><br>
-            <input class='p-3 w-full my-2 bg-gray-900 border-slate-700 rounded-lg' type="text" id="phone" placeholder="Your Phone Number" name="phone">
+            <input class='p-3 w-full my-2 bg-gray-900 border-slate-700 rounded-lg' type="number" id="phone" placeholder="Your Phone Number" name="phone">
         </div>
         <div class='message'>
             <label for="message">Message</label><br>

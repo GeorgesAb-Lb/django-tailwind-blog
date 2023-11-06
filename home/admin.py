@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django import forms
 from home.models import Blog
+from .models import Contact
 
 # Register your models here.
 class BlogAdminForm(forms.ModelForm):
@@ -14,3 +15,4 @@ class BlogAdmin(admin.ModelAdmin):
     form = BlogAdminForm
 
 admin.site.register(Blog, BlogAdmin)
+admin.site.register(Contact)
